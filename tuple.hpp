@@ -1,6 +1,5 @@
-#include <cstddef>
-#include <utility>
-#include <memory>
+#include <cstddef> // for std::size_t
+#include <utility> // for std::foward
 
 // Actual implementation for a type
 template <std::size_t _index, typename T>
