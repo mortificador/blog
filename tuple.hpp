@@ -1,5 +1,7 @@
 #include <cstddef> // for std::size_t
 #include <utility> // for std::foward
+#include <string>
+#include <type_traits>
 
 // Actual implementation for a type
 template <std::size_t _index, typename T>
@@ -34,12 +36,12 @@ class _tuple_recurr_base
 // This is a partial specialization, so as long as there is at least one argument
 // this specialization is preferred to the _tuple_recurr_base<std::size_t, typename ...types>
 template <std::size_t _index, typename L, typename... types>
-class _tuple_recurr_base<_index, L, types...> : public _tuple_impl<_index, L>,
+class _tuple_recurr_base<_index, L, types...> : public _tuple_impl<_index, typename std::remove_reference<L>::type>,
                                                 public _tuple_recurr_base<_index + 1, types...>
 {
 public:
   template <typename CL, typename... CArgs>
-  _tuple_recurr_base(CL &&arg, CArgs &&... args) : _tuple_impl<_index, CL>(std::forward<CL>(arg)),
+  _tuple_recurr_base(CL &&arg, CArgs &&... args) : _tuple_impl<_index, typename std::remove_reference<CL>::type>(std::forward<CL>(arg)),
                                                    _tuple_recurr_base<_index + 1, types...>(std::forward<CArgs>(args)...)
   {
   }
@@ -107,4 +109,13 @@ template <typename... Args>
 bool operator==(tuple<Args...> &t1, tuple<Args...> &t2)
 {
   return compare_tuple<sizeof...(Args) - 1>(t1, t2);
+}
+
+int main()
+{
+    std::string c{"lol"};
+    int a = 1;
+    tuple t{5.0, 6, c};
+
+    return get<1>(t);
 }
